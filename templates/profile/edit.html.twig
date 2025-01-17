@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le profil{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Modifier votre profil</h1>
+
+        {{ form_start(form) }}
+            {{ form_row(form.bio) }}
+
+            <div class="mb-3">
+                <label for="currentAvatar">Avatar actuel</label>
+                {% if app.user.profile.avatar %}
+                    <img src="{{ asset(app.user.profile.avatar) }}" alt="Avatar actuel" class="img-fluid rounded mb-3" style="max-width: 200px;">
+                {% else %}
+                    <p>Aucun avatar défini.</p>
+                {% endif %}
+            </div>
+
+            {{ form_row(form.avatar) }}
+
+            <button type="submit" class="btn btn-primary mt-3">Enregistrer</button>
+        {{ form_end(form) }}
+
+        <a href="{{ path('user_show', { id: app.user.id }) }}" class="btn btn-secondary mt-3">Retour au profil</a>
+    </div>
+{% endblock %}

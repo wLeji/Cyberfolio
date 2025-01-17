@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ user.firstname }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Profil de {{ user.firstname }} {{ user.lastname }}</h1>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">Informations personnelles</h2>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Email :</strong> {{ user.email }}</li>
+                    <li class="list-group-item"><strong>Prénom :</strong> {{ user.firstname }}</li>
+                    <li class="list-group-item"><strong>Nom :</strong> {{ user.lastname }}</li>
+                </ul>
+            </div>
+        </div>
+
+        {% if user.profile %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">Profil</h2>
+                    <p class="card-text">{{ user.profile.bio }}</p>
+                    {% if user.profile.avatar %}
+                        <img src="{{ asset(user.profile.avatar) }}" alt="Avatar de {{ user.firstname }}" class="img-fluid rounded" style="max-width: 200px;">
+                    {% endif %}
+                </div>
+            </div>
+            {% if app.user and app.user.id == user.id or is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('profile_edit', { id: user.profile.id }) }}" class="btn btn-warning">Modifier votre profil</a>
+            {% endif %}
+        {% endif %}
+
+        {% if user.projects is not empty %}
+            <h2 class="mb-4">Projets</h2>
+            <div class="row">
+                {% for project in user.projects %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3 class="card-title">{{ project.title }}</h3>
+                                <p class="card-text">{{ project.description }}</p>
+                                <p><strong>Créé le :</strong> {{ project.createdAt|date('d/m/Y') }}</p>
+
+                                {% if project.screenshot %}
+                                    <img src="{{ asset(project.screenshot) }}" alt="Screenshot du projet {{ project.title }}" class="img-fluid mb-3" style="max-width: 100%; height: auto;">
+                                {% endif %}
+
+                                {% if project.technologies is not empty %}
+                                    <h4>Technologies utilisées :</h4>
+                                    <ul>
+                                        {% for tech in project.technologies %}
+                                            <li>
+                                                <img src="{{ asset(tech.logo) }}" alt="{{ tech.name }}" style="width: 20px; height: 20px; margin-right: 10px;">
+                                                {{ tech.name }} ({{ tech.version }})
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% if app.user and app.user.id == user.id or is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('project_edit', { id: project.id }) }}" class="btn btn-warning">Modifier</a>
+                        <a href="{{ path('project_delete', { id: project.id }) }}" class="btn btn-danger"
+                            onclick="return confirm('Voulez-vous vraiment supprimer ce projet ?');">Supprimer</a>
+                    {% endif %}
+                {% endfor %}
+                <a href="{{ path('project_new') }}" class="btn btn-success">Ajouter un projet</a>
+            </div>
+        {% else %}
+            <p>Aucun projet associé à cet utilisateur.</p>
+        {% endif %}
+
+        <a href="{{ path('user_list') }}" class="btn btn-primary mt-4">Retour à la liste des utilisateurs</a>
+    </div>
+{% endblock %}
